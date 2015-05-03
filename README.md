@@ -1,5 +1,5 @@
 # MoSuMa_tools
-A perl script pipeline for compiling molecular supermatrices.
+A perl script pipeline for compiling MOlecular SUperMAtrices.
 
 Currently, this pipeline deals with two input files: a list of genes (or other sequence data) as BLAST targets, and an assembled transcriptome in which to carry out the BLAST search. Data can be in amino acids or nucleotides. Outputs are aligned matrices for each sequence, ready for concatenation into a supermatrix, gene-tree analysis, or anything else really.
 
