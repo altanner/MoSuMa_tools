@@ -5,4 +5,4 @@ Currently, this pipeline deals with two input files: a list of genes (or other s
 
 In future this pipeline will be able to deal with genomic and other genetic data input files. It will also be possible to fully automate the pipeline in situations where human interaction to check correct operation is unnecessary.
 
-Please report all bugs to jairly (al.tanner@gmail.com)
+Please report all bugs to jairly. Thanks :)
