@@ -32,7 +32,7 @@ foreach my $phylip_file_name (@phylip_files) {
     }
 
     close PHYLIP;
-    $phylip_file_name =~ s/$ARGV[0]//;
+    $phylip_file_name =~ s/$ARGV[0]$//;
     my $outfile_name = "$phylip_file_name" . "$ARGV[1]";
     open OUT, (">$outfile_name") || die "There is a problem opening $outfile_name\n";
     print OUT ">$_\n$taxa_seq{$_}\n" for (sort keys %taxa_seq);
