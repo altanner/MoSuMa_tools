@@ -107,18 +107,13 @@ perl blast_all_2015.pl [sequences_to_search_for]
 
 [fasta_file_to_search_in] [amino_acids_or_nucleotides?]
 
-eg (if the transcriptome is in
+eg (if the transcriptome is in nucleotides)
 
-perl blast_all.pl aplysia_seqs
+perl blast_all.pl aplysia_seqs gallus_transcriptome.fas -nt
 
-or (if the transcriptome is in
+or (if the transcriptome is in amino acids)
 
-perl blast_all.pl aplysia_seqs
-nucleotides)
-
-gallus_transcriptome.fas -nt
-amino acids)
-gallus_transcriptome.fas –aa
+perl blast_all.pl aplysia_seqs gallus_transcriptome.fas -aa
 
 Blast_all_2015.pl will do a cursory check that the output files look ok
 (it counts how many lines there are and reports if they look too short;
