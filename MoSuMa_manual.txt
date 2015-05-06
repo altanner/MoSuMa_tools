@@ -1,0 +1,244 @@
+======================================================================
+Al Tanner March 2015 
+
+Please report bugs to jairly (GitHub)
+
+A pipeline for automated [1] blasting, [2] extraction of most
+significant blast hits, [3] insertion of these selected hits into a
+profile, [4] profile alignment, [5] ML tree inference.
+
+For this pipeline to run, you will need input data:
+
+a. a list of the genes (or other sequence information) which you are
+searching for, in a single plain text file. The format for this file is
+one sequence name and sequence string per line:
+[seq_name] [sequence]
+There should be no spaces or special characters in the name or the
+sequence (NB, “|” and “-“ may be considered a special character). For
+example, for three genes the file might look like:
+COX1 MGHNSKDUNDILSMNDIFNFOSMS
+shh SKFNNNSISNALASLOAWOLIALIEAWILAIWALWIWUERR
+gene3 AMEDEIALLLLSLSKSOWLWKEDNNNBVHXUCKCIXKIIIIIKSLSQ
+
+b. a FASTA formatted file in which you are searching for the sequences
+in the sequence file. This might be a transcriptome or a genome, or any
+other type of sequence information. This can be amino acids or
+nucleotides, but must be standard FASTA formatted.
+
+You will also need software:
+
+a. “formatdb” – this is installed on Doraemon, but it can be found here.
+b. “blastall” – this is installed on Doraemon, but it can be found here.
+c. “muscle” – this is installed on Doraemon, but it can be found here.
+d. “PhyML” – this is installed on Doraemon, but it can be found here.
+e. the perl scripts which run this pipeline:
+fasta_clean_2015.pl
+blast_all_2015.pl
+extract_blast_2015.pl
+
+Although I have taken all care to code these scripts as to be error
+free, I give no guarantee of perfection. So, please check your own data
+to see that things are progressing as you expect. I accept no
+responsibility for things like your research being meaningless, your
+paper being rejected, or you looking very silly. Caveat cursor.
+Writing in blue is optional instruction for batch processing of multiple
+files. These involve shell scripts which you may have to modify.
+
+=======================================================================
+
+All of the automated instructions assume you are in a folder which
+contains
+1. all of the perl scripts listed above, as named above,
+2. your file listing the genes to be searched for,
+3. folders containing the transcriptomes (or whatever) that are being
+searched in. These should be consistently named.
+4. **Nothing else**. Unrelated folders will mess up folder loops.
+If you follow these instructions perfectly, they should work perfectly.
+But if in doubt, do things manually
+
+========================================================================
+
+Instructions
+
+1. Preparation. Fasta headers can contain non-standard characters (in
+particular spaces) which will cause (often undetectable) problems with
+formatdb, blast, and these scripts. The script fasta_clean_2015.pl will
+remove these characters.
+
+perl fasta_clean_2015.pl wombat.fas wombat.cln
+
+will clean the file “wombat.fas”, saving to the file “wombat.cln”.
+This can be automated using a script such as this:
+
+for i in */; do echo $i; cd $i; for t in *.fas; do perl
+../fasta_clean_2015.pl $t $t.cln; done; cd ..; done
+
+========================================================================
+
+2. Formatting for blast. The data in which you are searching needs to be
+formatted to be searchable by blast. This is done by running formatdb on
+the fasta sequence file, using “-i” to signify the input file, and “-p”
+to say if the data is amino acids or nucleotides (aa = T, nuc = F):
+
+formatdb –i [fasta_file] –p [T or F]
+
+eg
+
+formatdb –i gallus_transcriptome.fas.cln –p T
+
+This will create three new files, named as this input file and appended
+.nhr .nin and .nsq (for nucleotides) or .phn .pin and .psq (for protein
+sequences). You do not need to use them from now on – but they need to
+be there.
+This can be automated using a script such as this:
+
+for i in */; do echo $i; cd $i; echo "Formatting..."; formatdb -i *.cln
+-p F; cd ..; done
+
+========================================================================
+
+3. Blast automation. In the same folder as these files, the
+“blast_all_2015.pl” script needs to be run. This will output a
+blast_out_[sequence_name] file, for each of the sequences in your
+searchable file, stored in a folder called “blast_out/”. The script is
+run as follows:
+
+perl blast_all_2015.pl [sequences_to_search_for]
+
+[fasta_file_to_search_in] [amino_acids_or_nucleotides?]
+
+eg (if the transcriptome is in
+
+perl blast_all.pl aplysia_seqs
+
+or (if the transcriptome is in
+
+perl blast_all.pl aplysia_seqs
+nucleotides)
+
+gallus_transcriptome.fas -nt
+amino acids)
+gallus_transcriptome.fas –aa
+
+Blast_all_2015.pl will do a cursory check that the output files look ok
+(it counts how many lines there are and reports if they look too short;
+normally this is due to applying –aa rather than –nt, or vice versa).
+In this batch processing example, my file of sequences to blast is
+called Aplysia_seqs.txt: adjust as necessary
+
+for i in */; do echo $i; cd $i; perl ../blast_all_2015.pl
+../Aplysia_seqs.txt *_nt.fas.cln -nt; cd ..; done
+
+=========================================================================
+
+4. Significant hit selection. The most significant hit (and other high
+hits within 3 orders of magnitude of the most significant hit) from the
+blast operations are identified and placed into a fasta formatted file
+using extract_blast_2015.pl. This is run in the folder containing the
+blast output:
+
+perl extract_blast_2015.pl [cut-off e-value] [new fasta header]
+
+for example, you might want to exclude all e-values greater than ten to
+the minus twenty (1e-20), and name all of the output fasta headers as
+“>Mus_musculus”:
+
+perl extract_blast_2015.pl -20 Mus_musculus
+
+Selected sequences will be written to files suffixed “.sel” and put in a
+folder “selected_hits/”. extract_blast_2015.pl will write details from
+its parsing into a logfile “extract_blast.log” (to keep things neat, in
+the folder above the blast out files). Hits are numbered to avoid
+synonyms. These might not always be consecutively numbered – some
+numbered records will have been discounted. If you see “missing” hit
+numbers, don’t worry – all the hits are there. Be aware that some
+programs will truncate long fasta header names – this might remove the
+number, introducing synonyms to the taxa set, which often causes
+problems.
+This can be automated using a script such as this:
+
+for i in */; do echo $i; trimmed=$(echo $i | sed 's~/$~~'); cd
+$i/blast_out; perl ../../extract_blast_2015.pl -10 $trimmed; cd ../../;
+done
+
+========================================================================
+
+5. Combining hits to a profile (or making a new gene profile). Scripting
+this is a little difficult because you might not have followed my folder
+structure as above. Or, you might prefer to use a text editor. However,
+it is not too difficult to script this on the command line. Ensure that
+your filenames are consistent before combining. If you only have a few
+to do, you could use the bash command “cat” to put them into a file:
+
+for file in *.fas; do echo $file; trimmed=$(echo $file | sed
+'s~\.fas~~'); cat $file $trimmed.sel > $trimmed.add; done
+
+each .add file is now your fasta file with the selected hits added. You
+might get some errors from cat for genes that did not have any
+significant hits – this should not cause any problems.
+
+You could try a shell script something like the
+one below. You will have to edit the last part of this script so that it
+ends up back in the right folder when restarting the loop. Also, make a
+folder one layer up from your base folder called “holding_bay/” first,
+with your profiles in:
+
+for folder in */; do echo $folder; cd $folder/blast_out/selected_hits/;
+mv ../../../../holding_bay/* .; for f in *.fas; do trimmed=$(echo $f |
+sed 's~\.fas~~'); cat $f $trimmed.sel > $trimmed.add; done; mv *.add
+../../../../holding_bay; rm *.fas; cd ../../../../holding_bay; for q in
+*.add; do mv $q $(echo $q | sed 's/\.add/\.fas/g'); done; cd
+../insert_test/; echo "OK, all combined sequences in holding_bay...";
+done
+
+========================================================================
+
+6. Aligning. This is also easiest on the command line using “muscle”,
+but you may want to use another aligning software. For example, in a
+folder containing the fasta profiles, named *.fas, a script like this
+will align them all:
+
+for i in *.fas; do trimmed=$(echo $i | sed 's~\.fas~~'); muscle -in $i -
+out $trimmed.ali; done
+
+Aligning can take some time. So that the process is not dependent on a
+shell being open / terminal being connected, it can be wrapped in nohup:
+
+nohup sh -c 'for i in *.fas; do trimmed=$(echo $i | sed 's~\.fas~~');
+muscle -in $i -out $trimmed.ali; done' &
+
+=========================================================================
+
+7. Creating gene trees. These alignments are now ready for whatever you
+want to do next: perhaps make gene trees, or just concatenate. A simple
+way to make gene trees is to use “PhyML” on the command line, but you
+will need to convert the fasta alignments to phylip. The script
+fasta2phylip.pl can do this for you (included with these files).
+perl fasta2phylip.pl [input file suffix] [output file suffix]
+for example
+
+perl fasta2phylip.pl .fas .phy
+
+will convert all files suffixed “.fas” to phylip.
+See the PhyML website for detail on the arguments it can take. As a
+minimum, PhyML requires:
+
+phyml -i [input phylip file] -d [amino acids or nucleotides]
+
+for example
+
+phyml –i gallus-EF2.phy –d aa
+
+Multiple phylip files can be handled with a shell script such as
+
+for i in *.phy; do phyml -i $i -d aa; done
+
+ML tree building tends to be time-consuming, so you might want to use
+nohup:
+
+for i in *.phy; do nohup phyml -i $i -d aa; done &
+
+Note that this is a different way of using nohup than above!
+The output trees will be in *phyml_tree.txt.
+
+=========================================================================
