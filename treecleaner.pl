@@ -1,5 +1,8 @@
-# TREECLEANER by Al Tanner, July 2014.
-# Examines NEWICK trees for long branches
+
+# TREECLEANER by Al Tanner, July 2014,
+# University of Bristol, Palaeobiology Research Group.
+# Examines NEWICK trees for long branches, and removes them
+# from the phylip molecular matrix which produced the tree.
 
 use strict;
 use warnings;
