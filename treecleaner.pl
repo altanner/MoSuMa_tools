@@ -1,5 +1,5 @@
 ###################################################################
-# TREECLEANER.pl by Al Tanner, July 2014. Latest mod: 21 April 2015
+# TREECLEANER.pl by Al Tanner, July 2014. Latest mod: 26 May 2015
 # Examines NEWICK trees for long branches
 # Please report bugs on github/jairly/MoSuMa_tools        Thanks :)
 ###################################################################
@@ -12,7 +12,7 @@ use List::Util qw(sum);
 # use Statistics::Basic qw(:all); # this might cause problems to some people
 
 if (! $ARGV[1]) {
-    print "=== treecleaner.pl: USAGE: perl treecleaner.pl [tree file in NEWICK format] [threshold branch length]\n";
+    print "=== treecleaner.pl: USAGE: perl treecleaner.pl [tree file in Newick format] [threshold branch length]\n";
     print "=== EXAMPLE (3 standard deviations of mean length as threshold): perl treecleaner.pl fibro.tree 3\n";
     print "=== The higher the threshold branch length, the fewer branches will be identified as LONG.\n";
     print "=== To automatically modify the phylip file corresponding to the tree, add this after the threshold.\n";
@@ -23,7 +23,7 @@ if ($ARGV[2]) { # examine matrix file to modify
     if (! -e $ARGV[2]) {
 	die "Phylip file \"$ARGV[2]\" doesn't exist here.\n";
     }    
-    if (`grep ">" $ARGV[2]`) {
+    if (`grep "^>" $ARGV[2]`) {
 	die "File \"$ARGV[2]\" looks like a fasta file. I can only modify phylip files.\n";
     }
 }
@@ -34,7 +34,15 @@ my $phylip_to_modify = $ARGV[2];
 # open file
 open (TREEFILE, "<$ARGV[0]") || die "treecleaner.pl: Cannot find $ARGV[0] [$!]\n";  
 my $newick = <TREEFILE>; 
-close (TREEFILE); 
+if (`grep -o ";" $ARGV[0] | wc -l` != 1) { # checks for tree formatting.
+    print "Tree file \"$ARGV[0]\" doesn't seem to have the correct number of semi-colons.\n";
+    die "Please check the tree is in Newick format.\n";
+}
+if (`grep -o "(" $ARGV[0] | wc -l` != `grep -o ")" $ARGV[0] | wc -l`) {
+    print "There are an unequal number of close and open brackets in $ARGV[0].\n";
+    die "Please check the tree is in Newick format.\n";
+}
+close (TREEFILE);                          # end format checks
 
 # clean up newick and generate warnings
 chomp $newick;
