@@ -237,3 +237,22 @@ Note that this is a different way of using nohup than above!
 The output trees will be in *phyml_tree.txt.
 
 =========================================================================
+
+8. (experimental) LBA pruning. treecleaner.pl can examine the gene trees
+created by PhyML, identify branches being long, and remove the sequence
+which created the long-branch from the gene-alignment. A branch is
+identified as "long" if it exceeds the length of a certain number
+(defined by the user) of standard deviations from the mean branch length.
+treecleaner.pl requires a Newick string and its corresponding matrix
+as input files.
+
+for example
+
+perl treecleaner.pl fibro.tree 3 fibro.phy
+
+would search through the tree called "fibro.tree", identify any branches
+which are exceed the threshold of 3 standard deviations more than the
+mean, remove the corresponding sequence from the matrix file called
+"fibro.phy". A new matrix will be saved, appended with ".edited".
+
+==========================================================================
