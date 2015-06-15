@@ -41,7 +41,7 @@ foreach my $fasta_file_name (@fasta_files) {
 	    $taxa_seq{$taxa} = $seq;           # store both taxa and joined seqs   
 	    $seq_bool = 0;
 	    $taxa = ""; $seq = "";             # empty $taxa and $seq
-	    redo;                              # do this bit again to identify
+	    redo;                              # redo the while loop to catch the taxa
 	}                                      # (seqbool is reset and ready to go again)
     }	
     if ($seq) {                                # store last sequence
