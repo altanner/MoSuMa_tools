@@ -17,8 +17,8 @@ foreach my $fasta_file_name (@fasta_files) {
 	die "Are you sure these input files are fasta? They don't have many \">\" in them...\n";
     }
     $counter++;
-    my $taxa_counter = 0;
-    my $seq_length = 0;
+    my $taxa_counter = 0;                      # reset the taxon count
+    my $seq_length = 0;                        # reset the length of the sequence
     chomp $fasta_file_name;
     open (FASTA, "<$fasta_file_name") || die "Infile $fasta_file_name not found.";
     my %taxa_seq = ();                         # empty the hash of the previous data
@@ -36,14 +36,13 @@ foreach my $fasta_file_name (@fasta_files) {
 	if ((! /^>/) && ($seq_bool == 1)) {    # find seqeunces after ">"
 	    s/\s|\t//g;
 	    $seq .= $_;                        # join seqs on multiple lines
-	    next;
 	}
 	if ((/^>/) && ($seq_bool == 1)) {      # until new taxa is found,
 	    $taxa_seq{$taxa} = $seq;           # store both taxa and joined seqs   
 	    $seq_bool = 0;
 	    $taxa = ""; $seq = "";             # empty $taxa and $seq
-	    redo;                              # do this bit again to identify taxa
-	}
+	    redo;                              # do this bit again to identify
+	}                                      # (seqbool is reset and ready to go again)
     }	
     if ($seq) {                                # store last sequence
 	$taxa_seq{$taxa} = $seq;
