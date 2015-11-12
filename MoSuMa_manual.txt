@@ -199,7 +199,7 @@ out $trimmed.ali; done
 Aligning can take some time. So that the process is not dependent on a
 shell being open / terminal being connected, it can be wrapped in nohup:
 
-nohup sh -c 'for i in *.fas; do trimmed=$(echo $i | sed 's~\.fas~~');
+nohup bash -c 'for i in *.fas; do trimmed=$(echo $i | sed 's~\.fas~~');
 muscle -in $i -out $trimmed.ali; done' &
 
 =========================================================================
@@ -231,9 +231,8 @@ for i in *.phy; do phyml -i $i -d aa; done
 ML tree building tends to be time-consuming, so you might want to use
 nohup:
 
-for i in *.phy; do nohup phyml -i $i -d aa; done &
+nohup bash -c 'for i in *.phy; do phyml -i $i -d aa; done' &
 
-Note that this is a different way of using nohup than above!
 The output trees will be in *phyml_tree.txt.
 
 =========================================================================
