@@ -34,7 +34,7 @@ foreach my $fasta_file_name (@fasta_files) {
 	    next;
 	}
 	if ((! /^>/) && ($seq_bool == 1)) {    # find seqeunces after ">"
-	    s/\s|\t//g;
+	    s/\s|\t//g;                        # clean up spaces and tabs
 	    $seq .= $_;                        # join seqs on multiple lines
 	}
 	if ((/^>/) && ($seq_bool == 1)) {      # until new taxa is found,
@@ -44,10 +44,11 @@ foreach my $fasta_file_name (@fasta_files) {
 	    redo;                              # redo the while loop to catch the taxa
 	}                                      # (seqbool is reset and ready to go again)
     }	
-    if ($seq) {                                # store last sequence
-	$taxa_seq{$taxa} = $seq;
+    if ($seq) {                                # if there is still a stored seq, it is the last one
+	$taxa_seq{$taxa} = $seq;               # store the last taxa and sequence.
+	$taxa_counter--;                       # the redo means the counter is too high by one.
     }
-    
+
     $seq_length = length ($seq);
     
     close FASTA;
