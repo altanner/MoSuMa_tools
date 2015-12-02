@@ -23,10 +23,16 @@ foreach my $fasta_file_name (@fasta_files) {
     open (FASTA, "<$fasta_file_name") || die "Infile $fasta_file_name not found.";
     my %taxa_seq = ();                         # empty the hash of the previous data
     my $seq_bool = 0;
-    my $taxa; my $seq;
+    my $taxa = ""; my $seq = "";
+    my @seen_taxa = ();
     while (<FASTA>) {
         chomp $_;
+	my $line = $_;
 	if ((/^>/) && ($seq_bool == 0)) {      # find taxa name
+	    if (grep $_ eq $line, @seen_taxa) {
+		die $_ . " is a duplicate header in $fasta_file_name. That is a problem.\n";
+	    }
+	    push @seen_taxa, $_;
 	    $taxa_counter++;
 	    $seq_bool = 1;                     # note that a taxa has been found
 	    $_ =~ s/>//;                       # remove fasta ">"
@@ -46,7 +52,6 @@ foreach my $fasta_file_name (@fasta_files) {
     }	
     if ($seq) {                                # if there is still a stored seq, it is the last one
 	$taxa_seq{$taxa} = $seq;               # store the last taxa and sequence.
-	$taxa_counter--;                       # the redo means the counter is too high by one.
     }
 
     $seq_length = length ($seq);
