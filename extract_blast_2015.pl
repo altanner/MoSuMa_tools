@@ -1,5 +1,5 @@
 ##########################################################################
-# extract_blast_2015.pl, Al Tanner, March 2015
+# extract_blast_2015.pl, Al Tanner, March 2015 rev Dec 2015
 # counts the number of high hits (the number of evalue = 0.0 hits,
 # or the highest hit plus any other hits within 3 orders of magnitude)
 # then extracts that many results from the blast output file,
@@ -155,7 +155,8 @@ sub extract { # puts the best hits into a fasta output file
 	    $extract_bool = 1;
 	}
         if ((/^Sbjct/) && ($extract_bool == 1)) {
-            my $extracted_sequence = substr $_, 11; # from 11 to the end of the line
+	    my $extracted_sequence = $_;
+	    $extracted_sequence =~ s/^Sbjct: [0-9]+//; # remove sbjct and hit line numbers
             $extracted_sequence =~ s/^\s+//; # get rid of opening space, if there is one
 	    my @extract_bits = split (/[ ]+/, $extracted_sequence); # avoid ending number
             $selected_sequence = $selected_sequence . $extract_bits[0];

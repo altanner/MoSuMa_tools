@@ -23,10 +23,16 @@ foreach my $fasta_file_name (@fasta_files) {
     open (FASTA, "<$fasta_file_name") || die "Infile $fasta_file_name not found.";
     my %taxa_seq = ();                         # empty the hash of the previous data
     my $seq_bool = 0;
-    my $taxa; my $seq;
+    my $taxa = ""; my $seq = "";
+    my @seen_taxa = ();
     while (<FASTA>) {
         chomp $_;
+	my $line = $_;
 	if ((/^>/) && ($seq_bool == 0)) {      # find taxa name
+	    if (grep $_ eq $line, @seen_taxa) {
+		die $_ . " is a duplicate header in $fasta_file_name. That is a problem.\n";
+	    }
+	    push @seen_taxa, $_;
 	    $taxa_counter++;
 	    $seq_bool = 1;                     # note that a taxa has been found
 	    $_ =~ s/>//;                       # remove fasta ">"
@@ -34,7 +40,7 @@ foreach my $fasta_file_name (@fasta_files) {
 	    next;
 	}
 	if ((! /^>/) && ($seq_bool == 1)) {    # find seqeunces after ">"
-	    s/\s|\t//g;
+	    s/\s|\t//g;                        # clean up spaces and tabs
 	    $seq .= $_;                        # join seqs on multiple lines
 	}
 	if ((/^>/) && ($seq_bool == 1)) {      # until new taxa is found,
@@ -44,10 +50,10 @@ foreach my $fasta_file_name (@fasta_files) {
 	    redo;                              # redo the while loop to catch the taxa
 	}                                      # (seqbool is reset and ready to go again)
     }	
-    if ($seq) {                                # store last sequence
-	$taxa_seq{$taxa} = $seq;
+    if ($seq) {                                # if there is still a stored seq, it is the last one
+	$taxa_seq{$taxa} = $seq;               # store the last taxa and sequence.
     }
-    
+
     $seq_length = length ($seq);
     
     close FASTA;
