@@ -137,14 +137,11 @@ foreach (@multi_clades) {
     $multi_clade_members =~ s/:.*?\)$//;     # remove closing bracket
     s/\(/\\\(/g;                             # replace open bracket with ACTUAL backslash open bracket
     s/\)/\\\)/g;                             # replace close bracked with ACTUAL backslash close bracket
-#    my $multi_clade_length = `grep -E -o "$_.*?[,|)]" $clean_newick_temporary`;
-#    $multi_clade_length =~ s/^.*://g;        # remove stuff at start
-#    $multi_clade_length =~ s/.$//g;          # remove last char, usually ","
-#    $multi_clades_and_lengths{$multi_clade_members} = $multi_clade_length;
+    my $multi_clade_length = `grep -E -o "$_.*?[,|)]" $clean_newick_temporary`;
+    $multi_clade_length =~ s/^.*://g;        # remove stuff at start
+    $multi_clade_length =~ s/.$//g;          # remove last char, usually ","
+    $multi_clades_and_lengths{$multi_clade_members} = $multi_clade_length;
 }
-
-# The four lines above are commented because for some reason grep can run out of
-# memory and it wont work... not sure about this. Clearly I'm being stupid.
 
 # uncomment the following line for full multiple member clade commentary output
 #print "$_ $multi_clades_and_lengths{$_}\n" for (keys %multi_clades_and_lengths);
