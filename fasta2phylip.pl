@@ -62,7 +62,7 @@ foreach my $fasta_file_name (@fasta_files) {
     open OUT, (">$outfile_name") || die "There is a problem opening $outfile_name\n";
     print OUT "$taxa_counter $seq_length\n";
     print OUT "$_ $taxa_seq{$_}\n" for (sort keys %taxa_seq);
-    print "=== $fasta_file_name converted to $fasta_file_name$ARGV[1] ===\n";
+#    print "=== $fasta_file_name converted to $fasta_file_name$ARGV[1] ===\n";
 }    
 if ($counter == 0) {
     die "There don't seem to be any files suffixed \"$ARGV[0]\" here...\n";
