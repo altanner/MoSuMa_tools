@@ -10,7 +10,7 @@
 # hit from each of those orthologous fastas, ready for blast operations.
 #
 # USAGE: bash ortho2blasttarget.sh [minimum number of seqs per orthologous group]
-# EXAMPLE: bash ortho2blasttarget.sh 20 (will extract all orthogroups with 20 or more seqs in)
+# EXAMPLE: bash ortho2blasttarget.sh 20 fa (will extract all orthogroups with 20 or more seqs in, looking through files suffixed with .fa)
 #
 
 minimum_seqs=$1
