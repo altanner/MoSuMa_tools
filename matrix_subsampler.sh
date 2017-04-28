@@ -13,10 +13,9 @@
 # this will make a new matrix of random positions, 1000 long
 # called "sub1000_arthropods.phy"
 
-# if there are not 3 arguments, quit
+# if there are not 3 arguments, quit                                                                                                                        
 if [[ $# -ne 3 ]] ; then
-    echo 'matrix_subsampler.sh: please include the matrix you wish to subsample :)'
-    echo 'matrix_subsampler.sh: please include the length of the ouput matrix :)'
+    echo 'matrix_subsampler.sh: please include the matrix you wish to subsample, length of output, and name of output file :)'
     echo 'example: bash matrix_subsampler.sh arthropods.phy 1000 sub1000_arthropods.phy'
     exit 0
 fi
