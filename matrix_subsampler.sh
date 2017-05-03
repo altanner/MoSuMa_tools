@@ -74,6 +74,14 @@ cat $1_rand_block_no_phylip_metadata >> $3;
 echo "matrix_subsampler.sh: ok done."
 echo "Matrix $1 has been randomly subsampled to $2 positions, output: $3"
 
+# report ambiguity content of output matrix
+dash_count=`grep -o "-" $1_seqs_random_trimmed | wc -l`;
+X_count=`grep -o "X" $1_seqs_random_trimmed | wc -l`;
+total_ambiguous_characters=$(($dash_count + $X_count));
+total_characters=`wc $1_seqs_random_trimmed | awk '{print $3-$1}'`;
+percent_ambiguous_characters=$((200*$total_ambiguous_characters/$total_characters % 2 + 100*$total_ambiguous_characters/$total_characters));
+echo "Matrix $1 is around $percent_ambiguous_characters% incomplete or ambiguous.";
+
 # cleanup debug files
 rm $1_no_empty_lines;
 rm $1_no_header;
