@@ -17,13 +17,13 @@
 if [[ $# -ne 3 ]] ; then
     echo 'matrix_subsampler.sh: please include the matrix you wish to subsample, length of output, and name of output file :)'
     echo 'example: bash matrix_subsampler.sh arthropods.phy 1000 sub1000_arthropods.phy'
-    exit 0
+    exit 0;
 fi
 
 # if the file looks like a fasta, quit
-if grep -q ">" "$1"; then
+if grep -q ">" $1; then
     echo 'matrix_subsampler.sh: this looks like a fasta file. I can only deal with phylip :/'
-    exit 0
+    exit 0;
 fi
 
 # remove any empty lines
