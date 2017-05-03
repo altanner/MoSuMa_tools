@@ -20,6 +20,12 @@ if [[ $# -ne 3 ]] ; then
     exit 0
 fi
 
+# if the file looks like a fasta, quit
+if grep -q ">" "$1"; then
+    echo 'matrix_subsampler.sh: this looks like a fasta file. I can only deal with phylip :/'
+    exit 0
+fi
+
 # remove any empty lines
 sed '/^\s*$/d' $1 > $1_no_empty_lines;
 
