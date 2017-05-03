@@ -74,7 +74,7 @@ cat $1_rand_block_no_phylip_metadata >> $3;
 echo "matrix_subsampler.sh: ok done."
 echo "Matrix $1 has been randomly subsampled to $2 positions, output: $3"
 
-# cleanup
+# cleanup debug files
 rm $1_no_empty_lines;
 rm $1_no_header;
 rm $1_seqs;
