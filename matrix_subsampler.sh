@@ -35,6 +35,13 @@ for i in $field_count_per_line; do
     fi
 done
 
+# if asking for matrix longer than input, quit                                                                                      
+matrix_length=`awk '{print $(NF)}' $1 | head -1`;
+if [[ $2 -gt $matrix_length ]] ; then
+    echo "matrix_subsampler.sh: $1 is $matrix_length positions long. I cannot make a matrix longer than the input file... :/";
+    exit 0;
+fi
+
 # otherwise, start processing
 echo 'matrix_subsampler.sh: thinking...';
 
