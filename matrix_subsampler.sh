@@ -17,7 +17,7 @@
 if [[ $# -ne 3 ]] ; then
     echo "matrix_subsampler.sh: please include the matrix you wish to subsample, length of output, and name of output file :)";
     echo "example: bash matrix_subsampler.sh arthropods.phy 1000 sub1000_arthropods.phy";
-    exit 0;
+    exit 1;
 fi
 
 # remove any empty lines
@@ -26,15 +26,15 @@ sed '/^\s*$/d' $1 > $1_no_empty_lines;
 # if the file looks like a fasta, quit
 if grep -q ">" $1_no_empty_lines; then
     echo "matrix_subsampler.sh: $1 looks like a fasta file. I can only deal with phylip :/";
-    exit 0;
+    exit 1;
 fi
 
 # if it doesn't look like phylip, quit
 field_count_per_line=`awk '$0=NF' $1_no_empty_lines`;
 for i in $field_count_per_line; do 
     if [[ $i -ne 2 ]] ; then 
-	    echo "matrix_subsampler.sh: $1 doesn't look like a phylip file. It doesn't have two fields per line... :/";
-	    exit 0;
+	echo "matrix_subsampler.sh: $1 doesn't look like a phylip file. It doesn't have two fields per line... :/";
+	exit 1;
     fi
 done
 
@@ -42,7 +42,7 @@ done
 matrix_length=`awk '{print $(NF)}' $1_no_empty_lines | head -1`;
 if [[ $2 -gt $matrix_length ]] ; then
     echo "matrix_subsampler.sh: $1 is $matrix_length positions long. I cannot make a matrix longer than the input file... :/";
-    exit 0;
+    exit 1;
 fi
 
 # otherwise, start processing
@@ -112,3 +112,5 @@ rm $1_seqs_trans_random;
 rm $1_seqs_random;
 rm $1_seqs_random_trimmed;
 rm $1_rand_block_no_phylip_metadata;
+
+exit 0;
