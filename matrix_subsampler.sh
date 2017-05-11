@@ -9,23 +9,33 @@
 # randomly subsampled by position, of a designated length.
 
 # usage: matrix_subsampler.sh [input file name] [length of output matrix] [output file name]
-# example: matrix_subsampler.sh arthropods.phy 1000 sub1000_arthropods.phy
+# example: bash matrix_subsampler.sh arthropods.phy 1000 sub1000_arthropods.phy
 # this will make a new matrix of random positions, 1000 long
 # called "sub1000_arthropods.phy"
 
 # if there are not 3 arguments, quit                                                                                                                        
 if [[ $# -ne 3 ]] ; then
-    echo 'matrix_subsampler.sh: please include the matrix you wish to subsample, length of output, and name of output file :)'
-    echo 'example: bash matrix_subsampler.sh arthropods.phy 1000 sub1000_arthropods.phy'
+    echo "matrix_subsampler.sh: please include the matrix you wish to subsample, length of output, and name of output file :)";
+    echo "example: bash matrix_subsampler.sh arthropods.phy 1000 sub1000_arthropods.phy";
     exit 0;
 fi
 
 # if the file looks like a fasta, quit
 if grep -q ">" $1; then
-    echo 'matrix_subsampler.sh: this looks like a fasta file. I can only deal with phylip :/'
+    echo "matrix_subsampler.sh: $1 looks like a fasta file. I can only deal with phylip :/";
     exit 0;
 fi
 
+# if it doesn't look like phylip, quit
+field_count_per_line=`awk '$0=NF' $1`;
+for i in $field_count_per_line; do 
+    if [[ $i -ne 2 ]] ; then 
+	    echo "matrix_subsampler.sh: $1 doesn't look like a phylip file. It doesn't have two fields per line... :/";
+	    exit 0;
+    fi
+done
+
+# otherwise, start processing
 echo 'matrix_subsampler.sh: thinking...';
 
 # remove any empty lines
