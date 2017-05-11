@@ -26,6 +26,8 @@ if grep -q ">" $1; then
     exit 0;
 fi
 
+echo 'matrix_subsampler.sh: thinking...';
+
 # remove any empty lines
 sed '/^\s*$/d' $1 > $1_no_empty_lines;
 
@@ -81,7 +83,7 @@ questionmark_count=`grep -o "?" $1_seqs_random_trimmed | wc -l`;
 total_ambiguous_characters=$(($dash_count + $X_count + $questionmark_count));
 total_characters=`wc $1_seqs_random_trimmed | awk '{print $3-$1}'`;
 percent_ambiguous_characters=$((200*$total_ambiguous_characters/$total_characters % 2 + 100*$total_ambiguous_characters/$total_characters));
-echo "Matrix $1 is around $percent_ambiguous_characters% incomplete or ambiguous.";
+echo "Matrix $3 is around $percent_ambiguous_characters% incomplete or ambiguous.";
 
 # cleanup debug files
 rm $1_no_empty_lines;
