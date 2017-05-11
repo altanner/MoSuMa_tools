@@ -20,6 +20,12 @@ if [[ $# -ne 3 ]] ; then
     exit 1;
 fi
 
+# check input file exists                                                                                                                                 
+if [ ! -f $1 ]; then
+    echo "matrix_subsampler.sh: the file $1 doesn't seem to exist... :/"
+    exit 1;
+fi
+
 # remove any empty lines
 sed '/^\s*$/d' $1 > $1_no_empty_lines;
 
