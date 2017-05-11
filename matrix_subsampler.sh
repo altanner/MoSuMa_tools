@@ -20,14 +20,17 @@ if [[ $# -ne 3 ]] ; then
     exit 0;
 fi
 
+# remove any empty lines
+sed '/^\s*$/d' $1 > $1_no_empty_lines;
+
 # if the file looks like a fasta, quit
-if grep -q ">" $1; then
+if grep -q ">" $1_no_empty_lines; then
     echo "matrix_subsampler.sh: $1 looks like a fasta file. I can only deal with phylip :/";
     exit 0;
 fi
 
 # if it doesn't look like phylip, quit
-field_count_per_line=`awk '$0=NF' $1`;
+field_count_per_line=`awk '$0=NF' $1_no_empty_lines`;
 for i in $field_count_per_line; do 
     if [[ $i -ne 2 ]] ; then 
 	    echo "matrix_subsampler.sh: $1 doesn't look like a phylip file. It doesn't have two fields per line... :/";
@@ -35,8 +38,8 @@ for i in $field_count_per_line; do
     fi
 done
 
-# if asking for matrix longer than input, quit                                                                                      
-matrix_length=`awk '{print $(NF)}' $1 | head -1`;
+# if asking for matrix longer than input, quit
+matrix_length=`awk '{print $(NF)}' $1_no_empty_lines | head -1`;
 if [[ $2 -gt $matrix_length ]] ; then
     echo "matrix_subsampler.sh: $1 is $matrix_length positions long. I cannot make a matrix longer than the input file... :/";
     exit 0;
@@ -44,9 +47,6 @@ fi
 
 # otherwise, start processing
 echo 'matrix_subsampler.sh: thinking...';
-
-# remove any empty lines
-sed '/^\s*$/d' $1 > $1_no_empty_lines;
 
 # remove phylip metadata and sequence headers, so we have just matrix block.
 tail -n +2 $1_no_empty_lines > $1_no_header;
