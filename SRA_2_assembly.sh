@@ -14,6 +14,7 @@ if [[ $# -ne 1 ]] ; then
 fi
 
 # get .sra file from NCBI SRA
+cd ~/ncbi/public/sra/
 prefetch --max-size 100G $1;
 
 # dump the fastq data from sra file
@@ -21,6 +22,7 @@ fastq-dump -split-3 ~/ncbi/public/sra/$1.sra;
 
 # make an assembly directory
 mkdir ~/$1_assembly;
+cd !$;
 
 # move reads to assembly directory
 # and remove spaces, Trinity can't deal with spaces.
