@@ -2,8 +2,8 @@
 
 # automatically assembles data from a NCBI Short Read Archive
 # repository, using Trinity.
-# The script will prepare a qsub PBS script and queue it
-# on the system job server.
+# The script will prepare a qsub PBS script and submit it to
+# the job queue as a high memory task using 8 processors.
 # All records will be assumed to be paired-end reads!!
 
 # if the record isn't given, quit.
@@ -37,11 +37,11 @@ echo "#PBS -l walltime=120:00:00,nodes=1:ppn=8" >> ~/$1_assembly/$1_assembly.pbs
 echo "#PBS -q highmem" >> ~/$1_assembly/$1_assembly.pbs;
 echo "module load samtools/1.3.1" >> ~/$1_assembly/$1_assembly.pbs;
 echo "module load bowtie/1.1.2" >> ~/$1_assembly/$1_assembly.pbs;
-echo 'export RUNDIR="/home/at9362/weird_assemblies/Cephalothrix_hongkongiensis' >> ~/$1_assembly/$1_assembly.pbs;
-echo 'export APPLICATION="/home/at9362/bin/trinityrnaseq-2.1.1/Trinity"' >> ~/$1_assembly/$1_assembly.pbs;
-echo 'export RUNFLAGS=" --seqType fq -max_memory 100G --CPU 8 --min_kmer_cov 1 --left $1_1.fastq.cln --right $1_2.fastq.cln -trimmomatic --SS_lib_type RF --output trinity_out_$1 --full_cleanup"' >> ~/$1_assembly/$1_assembly.pbs;
-echo "cd $RUNDIR" >> ~/$1_assembly/$1_assembly.pbs;
-echo "$APPLICATION $RUNFLAGS" >> ~/$1_assembly/$1_assembly.pbs;
+echo "export RUNDIR='~/$1_assembly'" >> ~/$1_assembly/$1_assembly.pbs;
+echo "export APPLICATION='~/bin/trinityrnaseq-2.1.1/Trinity'" >> ~/$1_assembly/$1_assembly.pbs;
+echo "export RUNFLAGS=' --seqType fq -max_memory 100G --CPU 8 --min_kmer_cov 1 --left $1_1.fastq.cln --right $1_2.fastq.cln -trimmomatic --SS_lib_type RF --output trinity_out_$1 --full_cleanup'" >> ~/$1_assembly/$1_assembly.pbs;
+echo 'cd $RUNDIR' >> ~/$1_assembly/$1_assembly.pbs;
+echo '$APPLICATION $RUNFLAGS' >> ~/$1_assembly/$1_assembly.pbs;
 
 # submit PBS script
 qsub ~/$1_assembly/$1_assembly.pbs;
