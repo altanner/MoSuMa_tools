@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# automatically assembles data from a NCBI Short Read Archive
-# repository, using Trinity.
+# takes an NCBI SRA archive and assembles the reads using Trinity
 # The script will prepare a qsub PBS script and submit it to
 # the job queue as a high memory task using 8 processors.
 # All records will be assumed to be paired-end reads!!
