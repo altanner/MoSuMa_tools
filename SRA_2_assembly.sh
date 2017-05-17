@@ -13,7 +13,7 @@ if [[ $# -ne 1 ]] ; then
 fi
 
 # get .sra file from NCBI SRA
-cd $HOME/ncbi/public/sra/
+cd $HOME/ncbi/public/sra/;
 prefetch --max-size 100G $1;
 
 # dump the fastq data from sra file
