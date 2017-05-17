@@ -14,21 +14,21 @@ if [[ $# -ne 1 ]] ; then
 fi
 
 # get .sra file from NCBI SRA
-#cd $HOME/ncbi/public/sra/
-#prefetch --max-size 100G $1;
+cd $HOME/ncbi/public/sra/
+prefetch --max-size 100G $1;
 
 # dump the fastq data from sra file
-#fastq-dump -split-3 $HOME/ncbi/public/sra/$1.sra;
+fastq-dump -split-3 $HOME/ncbi/public/sra/$1.sra;
 
 # make an assembly directory
-#mkdir $HOME/$1_assembly;
-#cd $HOME/$1_assembly;
+mkdir $HOME/$1_assembly;
+cd $HOME/$1_assembly;
 
 # move reads to assembly directory
 # and remove spaces, Trinity can't deal with spaces.
-#mv $HOME/ncbi/public/sra/$1_* $HOME/$1_assembly;
-#perl -lape 's/\s+//sg' $HOME/$1_assembly/$1_1.fastq > $HOME/$1_assembly/$1_1.fastq.cln;
-#perl -lape 's/\s+//sg' $HOME/$1_assembly/$1_2.fastq > $HOME/$1_assembly/$1_2.fastq.cln;
+mv $HOME/ncbi/public/sra/$1_* $HOME/$1_assembly;
+perl -lape 's/\s+//sg' $HOME/$1_assembly/$1_1.fastq > $HOME/$1_assembly/$1_1.fastq.cln;
+perl -lape 's/\s+//sg' $HOME/$1_assembly/$1_2.fastq > $HOME/$1_assembly/$1_2.fastq.cln;
 
 # prepare PBS script
 echo "#!/bin/bash" > $HOME/$1_assembly/$1_assembly.pbs;
