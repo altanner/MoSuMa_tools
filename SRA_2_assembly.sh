@@ -14,36 +14,36 @@ if [[ $# -ne 1 ]] ; then
 fi
 
 # get .sra file from NCBI SRA
-cd ~/ncbi/public/sra/
-prefetch --max-size 100G $1;
+#cd $HOME/ncbi/public/sra/
+#prefetch --max-size 100G $1;
 
 # dump the fastq data from sra file
-fastq-dump -split-3 ~/ncbi/public/sra/$1.sra;
+#fastq-dump -split-3 $HOME/ncbi/public/sra/$1.sra;
 
 # make an assembly directory
-mkdir ~/$1_assembly;
-cd ~/$1_assembly;
+#mkdir $HOME/$1_assembly;
+#cd $HOME/$1_assembly;
 
 # move reads to assembly directory
 # and remove spaces, Trinity can't deal with spaces.
-mv ~/ncbi/public/sra/$1_* ~/$1_assembly;
-perl -lape 's/\s+//sg' ~/$1_assembly/$1_1.fastq > ~/$1_assembly/$1_1.fastq.cln;
-perl -lape 's/\s+//sg' ~/$1_assembly/$1_2.fastq > ~/$1_assembly/$1_2.fastq.cln;
+#mv $HOME/ncbi/public/sra/$1_* $HOME/$1_assembly;
+#perl -lape 's/\s+//sg' $HOME/$1_assembly/$1_1.fastq > $HOME/$1_assembly/$1_1.fastq.cln;
+#perl -lape 's/\s+//sg' $HOME/$1_assembly/$1_2.fastq > $HOME/$1_assembly/$1_2.fastq.cln;
 
 # prepare PBS script
-echo "#!/bin/bash" > ~/$1_assembly/$1_assembly.pbs;
-echo "#PBS -N $1_assembly" >> ~/$1_assembly/$1_assembly.pbs;
-echo "#PBS -l walltime=120:00:00,nodes=1:ppn=8" >> ~/$1_assembly/$1_assembly.pbs;
-echo "#PBS -q highmem" >> ~/$1_assembly/$1_assembly.pbs;
-echo "module load samtools/1.3.1" >> ~/$1_assembly/$1_assembly.pbs;
-echo "module load bowtie/1.1.2" >> ~/$1_assembly/$1_assembly.pbs;
-echo "export RUNDIR='~/$1_assembly'" >> ~/$1_assembly/$1_assembly.pbs;
-echo "export APPLICATION='~/bin/trinityrnaseq-2.1.1/Trinity'" >> ~/$1_assembly/$1_assembly.pbs;
-echo "export RUNFLAGS=' --seqType fq -max_memory 100G --CPU 8 --min_kmer_cov 1 --left $1_1.fastq.cln --right $1_2.fastq.cln -trimmomatic --SS_lib_type RF --output trinity_out_$1 --full_cleanup'" >> ~/$1_assembly/$1_assembly.pbs;
-echo 'cd $RUNDIR' >> ~/$1_assembly/$1_assembly.pbs;
-echo '$APPLICATION $RUNFLAGS' >> ~/$1_assembly/$1_assembly.pbs;
+echo "#!/bin/bash" > $HOME/$1_assembly/$1_assembly.pbs;
+echo "#PBS -N $1_assembly" >> $HOME/$1_assembly/$1_assembly.pbs;
+echo "#PBS -l walltime=120:00:00,nodes=1:ppn=8" >> $HOME/$1_assembly/$1_assembly.pbs;
+echo "#PBS -q highmem" >> $HOME/$1_assembly/$1_assembly.pbs;
+echo "module load samtools/1.3.1" >> $HOME/$1_assembly/$1_assembly.pbs;
+echo "module load bowtie/1.1.2" >> $HOME/$1_assembly/$1_assembly.pbs;
+echo "export RUNDIR='$HOME/$1_assembly'" >> $HOME/$1_assembly/$1_assembly.pbs;
+echo "export APPLICATION='$HOME/bin/trinityrnaseq-2.1.1/Trinity'" >> $HOME/$1_assembly/$1_assembly.pbs;
+echo "export RUNFLAGS=' --seqType fq -max_memory 100G --CPU 8 --min_kmer_cov 1 --left $1_1.fastq.cln --right $1_2.fastq.cln -trimmomatic --SS_lib_type RF --output trinity_out_$1_assembled --full_cleanup'" >> $HOME/$1_assembly/$1_assembly.pbs;
+echo 'cd $RUNDIR' >> $HOME/$1_assembly/$1_assembly.pbs;
+echo '$APPLICATION $RUNFLAGS' >> $HOME/$1_assembly/$1_assembly.pbs;
 
 # submit PBS script
-qsub ~/$1_assembly/$1_assembly.pbs;
+qsub $HOME/$1_assembly/$1_assembly.pbs;
 
 exit 0;
