@@ -160,7 +160,8 @@ sub extract { # puts the best hits into a fasta output file
             $extracted_sequence =~ s/^\s+//; # get rid of opening space, if there is one
 	    my @extract_bits = split (/[ ]+/, $extracted_sequence); # avoid ending number
             $selected_sequence = $selected_sequence . $extract_bits[0];
-	    $name_n_seq{$name . $seq_count} = $selected_sequence;
+	    my $zero_padded_seq_count = sprintf("%03d", $seq_count);
+	    $name_n_seq{$name . $zero_padded_seq_count} = $selected_sequence;
 	}
     }
     close IN;
