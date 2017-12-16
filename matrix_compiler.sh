@@ -85,4 +85,4 @@ find $starting_folder/../$out_folder$ali -name '*.fas.ali' -exec sh -c 'mv "$0" 
 # ummmmmmm that should be it
 echo "=== matrix_compiler.sh ==="
 echo "All done. Aligned gene matrices are in $out_folder$ali."
-echo "==========================
+echo "=========================="
