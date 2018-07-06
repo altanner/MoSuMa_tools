@@ -1,5 +1,5 @@
 ##########################################################################
-# extract_blast_2015.pl, Al Tanner, March 2015 rev Dec 2015
+# extract_blast_2015.pl, Al Tanner, March 2015 rev July 2018
 # counts the number of high hits (the number of evalue = 0.0 hits,
 # or the highest hit plus any other hits within 3 orders of magnitude)
 # then extracts that many results from the blast output file,
@@ -45,6 +45,7 @@ foreach my $infile (@files) {
     open (IN, "<$infile") || die "Problem opening $infile";
     while (<IN>) {
 	chomp;
+	$_ =~ s/^\s+//;# sometimes hit names have spaces at start of name. remove.
 	if ($_ =~ /^Sequences producing/) { # the table starts with this string
 	    $bool = 1;
 	}
@@ -54,6 +55,9 @@ foreach my $infile (@files) {
 	if (($_ =~ /^\w/) && ($bool == 1)) {
 	    my ($name, $bits, $evalue) = split (/[ ]+/, $_); # THIS MIGHT NOT WORK IF THERE ARE SPACES IN THE TITLE
 	    $seqs{$name} = $evalue;
+	}
+	if ($_ =~ /^>/) { # this is the end of the hit table, stop looking for hits
+	    last;
 	}
     }	
 
@@ -151,15 +155,13 @@ sub extract { # puts the best hits into a fasta output file
 	if ((/^>/) && ($extract_bool == 0)) {
 	    $fasta_bool = 1;
 	}
-	if ((/^ Score =/) && ($fasta_bool == 1)) {
+	if ((/^ Score =/) && ($fasta_bool == 1)) { # find where hits start
 	    $extract_bool = 1;
 	}
-        if ((/^Sbjct/) && ($extract_bool == 1)) {
+        if ((/^Sbjct/) && ($extract_bool == 1)) { # this line has the sequence hit it
 	    my $extracted_sequence = $_;
-	    $extracted_sequence =~ s/^Sbjct: [0-9]+//; # remove sbjct and hit line numbers
-            $extracted_sequence =~ s/^\s+//; # get rid of opening space, if there is one
-	    my @extract_bits = split (/[ ]+/, $extracted_sequence); # avoid ending number
-            $selected_sequence = $selected_sequence . $extract_bits[0];
+	    my @extract_bits = split (/[ ]+/, $extracted_sequence); # split seq line on spaces
+            $selected_sequence = $selected_sequence . $extract_bits[2]; # take the third field, append it to already found seqs
 	    my $zero_padded_seq_count = sprintf("%03d", $seq_count);
 	    $name_n_seq{$name . $zero_padded_seq_count} = $selected_sequence;
 	}
