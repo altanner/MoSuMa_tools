@@ -1,8 +1,8 @@
-###################################################################
+#####################################################################
 # TREECLEANER.pl by Al Tanner, July 2014. Latest mod: 26 May 2015
 # Examines NEWICK trees for long branches
-# Please report bugs on github/jairly/MoSuMa_tools        Thanks :)
-###################################################################
+# Please report bugs on github/altanner/MoSuMa_tools        Thanks :)
+#####################################################################
 
 use strict;
 use warnings;
