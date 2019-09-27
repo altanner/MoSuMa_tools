@@ -1,6 +1,9 @@
 #####################################################################
-# TREECLEANER.pl by Al Tanner, July 2014. Latest mod: 26 May 2015
+# TREECLEANER.pl final version by Al Tanner (July 2014). Latest mod: 30 sept 2019 bt Davide Pisani
 # Examines NEWICK trees for long branches
+# If you use to remove fast evolving taxa from a phylip alignment
+# it is imperative that you make sure the taxon names in the tree
+# and in the alignment are identical
 # Please report bugs on github/altanner/MoSuMa_tools        Thanks :)
 #####################################################################
 
@@ -29,7 +32,6 @@ if ($ARGV[2]) { # examine matrix file to modify
 }
 
 my $threshold = $ARGV[1];
-my $phylip_to_modify = $ARGV[2];
 
 # open file
 open (TREEFILE, "<$ARGV[0]") || die "treecleaner.pl: Cannot find $ARGV[0] [$!]\n";  
@@ -95,7 +97,7 @@ foreach (@terminal_branches) {
     $taxa_length{$taxa} = $length;
 }    
 
-my @keys = keys{%taxa_length};
+my @keys = keys(%taxa_length);
 # uncomment this loop for verbose output
 #foreach my $key (@keys) {
 #    printf ("%-25s\t%-20s\n", $key, $taxa_length{$key});
@@ -185,7 +187,6 @@ foreach my $branch_length (@branch_lengths) {
 
 # initiate hash of taxa to remove
 my @taxa_to_remove = "";
-
 # print terminal long branches
 if ($terminal_long_branch_count > 0) {
     print "\n----- Long branched taxa or clades in $ARGV[0] -----\n";
@@ -198,7 +199,6 @@ if ($terminal_long_branch_count > 0) {
 	$counter1++;
     }
 }
-
 # print internal long branches
 # if there are more than half the entire tree in a long branch clade,
 # the search has picked up the wrong end of the branch, and should ignore
@@ -257,16 +257,57 @@ if ($plus_warning == 1) {
 
 # create new phylip file with taxa removed and metadata updated for correct taxa count.
 if ($ARGV[2]) {
-    `cp $phylip_to_modify $phylip_to_modify.edited`;
-    foreach my $taxa_to_be_removed_from_phylip (@taxa_to_remove) {
-	`grep -v "^$taxa_to_be_removed_from_phylip " $phylip_to_modify.edited > temp && mv temp $phylip_to_modify.edited`;
+    chomp $ARGV[2];
+    my $phylip_infile = $ARGV[2];
+    my @dimensions_original_file;
+    my %alignment;
+    my $new_extension = "\.edited";
+    my $outfile = $phylip_infile . $new_extension;
+    my $number_of_sequences_to_remove = scalar (@taxa_to_remove);
+    #DEBUG - test what is in @taxa_to_remove
+    #print "\nBEBUG:  name of taxa to remove in \@taxa_to_remove array:\n@taxa_to_remove \n";
+    #DEBUG DONE
+   
+    open (PHYLYP_ALIGNMENT, "<$phylip_infile") || die "cannot open $phylip_infile \n";
+    while (<PHYLYP_ALIGNMENT>) # Read phylyp alignment and store alignment in hash named %alinment
+    {
+	chomp $_;
+	if ($_ =~ /^[0-9]+\s+[0-9]+$/) # extract dimensions of alignment - first line phylyp formatted file
+	{
+	    @dimensions_original_file = split (/ +/, $_);
+	}	
+	else
+	{
+       	my @one_species_and_data = split (/\s+/, $_);   # read in all the sequence data and pass them to hash 
+	$alignment{$one_species_and_data[0]} = $one_species_and_data[1];
+	}
     }
-    my $old_phylip_taxa_count = `grep -o -m 1 "[0-9].* " $phylip_to_modify.edited`;
-    chomp $old_phylip_taxa_count;
-    my $new_phylip_taxa_count = (`grep -c "" $phylip_to_modify.edited` - 1);
-    chomp $new_phylip_taxa_count; # perl inline: update phylip metadata taxa count vvvvv
-    `perl -p -i -e "s/$old_phylip_taxa_count/$new_phylip_taxa_count /" $phylip_to_modify.edited`;
-    print "\n$number_of_taxa_to_remove long branching taxa removed from $ARGV[2], saved to $phylip_to_modify.edited\n";
+    close PHYLYP_ALIGNMENT;
+    
+
+    print "\n";
+
+    foreach my $taxon_to_remove (@taxa_to_remove) 
+    {
+
+	print "TAXON & Sequence " . $taxon_to_remove .  "\t" . $alignment{$taxon_to_remove} . "removed from alignment\n"; #DEBUG LINE
+	delete($alignment{$taxon_to_remove});
+    }
+    my @keys_reduced_alignment = keys(%alignment);
+
+    print "\nThe size of the reduced alignment is = " . (scalar(@keys_reduced_alignment)) . "\n";  
+    print "The size of the original alignment was = " . $dimensions_original_file[0] . "\n";
+
+    open (OUT_PHYLYP, ">$outfile") || die "cannot opne $outfile \n";
+    my $new_number_of_taxa = $dimensions_original_file[0] - $number_of_sequences_to_remove;
+    my $number_of_characters = $dimensions_original_file[1];
+    print OUT_PHYLYP $new_number_of_taxa . " " . $number_of_characters . "\n";
+    foreach my $taxon (@keys_reduced_alignment)
+    {
+	print OUT_PHYLYP $taxon . "\t\t\t\t" . $alignment{$taxon} . "\n";
+    }
+
+print "\n$number_of_sequences_to_remove long branching taxa removed from $phylip_infile, saved to $outfile\n";
 }
 
 print "\nDone =================================================================\n\n";
@@ -274,4 +315,3 @@ print "\nDone =================================================================\
 # remove temporary newick file
 `rm $clean_newick_temporary`;
 
-exit;
