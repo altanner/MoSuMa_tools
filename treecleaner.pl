@@ -1,9 +1,6 @@
 #####################################################################
 # TREECLEANER.pl final version by Al Tanner (July 2014). Latest mod: 30 sept 2019 bt Davide Pisani
-# AT: Please be cautious of this script
-# AT: Check what it is doing is sensible, as the more OTUs trees have,
-# AT: the more chance it has of making errors.
-# AT: I do not know what the issue is, but let me know if you find out :)
+# AT: It is your responsibility to check that the output of this script is sensible!
 # Examines NEWICK trees for long branches
 # If you use to remove fast evolving taxa from a phylip alignment
 # it is imperative that you make sure the taxon names in the tree
